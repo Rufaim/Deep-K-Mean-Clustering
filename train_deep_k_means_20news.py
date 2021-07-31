@@ -2,13 +2,15 @@ import tensorflow as tf
 import numpy as np
 from sklearn.cluster import KMeans
 from sklearn.metrics import normalized_mutual_info_score
+from sklearn.datasets import fetch_20newsgroups
+from sklearn.feature_extraction.text import TfidfVectorizer
 from utils import cluster_acc
 from autoencoder import AutoEncoder
 from deep_k_means import DeepKMeans
 
-K = 10
+K = 20
 AE_NET = [(n,tf.nn.relu) for n in [500,500,2000]]
-EMBEDDING_SIZE = 10
+EMBEDDING_SIZE = 20
 LEARNING_RATE = 1e-3
 BATCH_SIZE = 256
 PRETRAIN_EPOCHS = 500
@@ -23,15 +25,20 @@ for gpu in gpus:
     [tf.config.LogicalDeviceConfiguration(memory_limit=2*1024)])
 
 
-(X_train,y_train),_ = tf.keras.datasets.mnist.load_data(path="./data")
-X_train = X_train.astype(np.float32) / 128 - 1
-X_train = X_train.reshape((X_train.shape[0],-1))
+_20news = fetch_20newsgroups(data_home="./data")
+y_train = _20news.target
+vectorizer = TfidfVectorizer(max_features=2000)
+X_train = vectorizer.fit_transform(_20news.data)
+X_train = X_train.toarray()
+
+
+
 
 ae = AutoEncoder(AE_NET,EMBEDDING_SIZE,SEED)
 dkmeans = DeepKMeans(ae,K,seed=SEED)
 kmeans = KMeans(n_clusters=K, init="k-means++",random_state=SEED)
 
-logdir = "logs/mnist"
+logdir = "logs/20news"
 file_writer = tf.summary.create_file_writer(logdir,flush_millis=10000)
 file_writer.set_as_default()
 

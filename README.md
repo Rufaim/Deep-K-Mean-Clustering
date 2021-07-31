@@ -5,7 +5,7 @@ This repository contains implementation of [Deep k-Means: Jointly clustering wit
 ## How to run
 
 ```bash
-python3 train_deep_k_means.py
+python3 train_deep_k_means_mnist.py
 ```
 The script launches comparison of Scikit-learn's implementation of K-Means with Deep K-Means.
 Test task is to separate MNIST data on 10 clusters. 

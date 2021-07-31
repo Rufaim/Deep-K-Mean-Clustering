@@ -2,6 +2,7 @@ import tensorflow as tf
 import numpy as np
 from sklearn.cluster import KMeans
 from sklearn.metrics import normalized_mutual_info_score
+from sklearn.datasets import fetch_openml
 from utils import cluster_acc
 from autoencoder import AutoEncoder
 from deep_k_means import DeepKMeans
@@ -16,6 +17,7 @@ FINETUNE_EPOCH = 250
 UPDATE_EPOCH = 1
 SEED = 42
 
+
 gpus = tf.config.list_physical_devices('GPU')
 # Out of jokes it is highly recommended to run the following experiment on gpu
 for gpu in gpus:
@@ -23,15 +25,17 @@ for gpu in gpus:
     [tf.config.LogicalDeviceConfiguration(memory_limit=2*1024)])
 
 
-(X_train,y_train),_ = tf.keras.datasets.mnist.load_data(path="./data")
-X_train = X_train.astype(np.float32) / 128 - 1
-X_train = X_train.reshape((X_train.shape[0],-1))
+usps = fetch_openml(name="USPS", version=2, data_home="./data")
+y_train = usps.target.to_numpy(dtype=np.int32)
+X_train = usps.data.to_numpy(dtype=np.float32)
+
+
 
 ae = AutoEncoder(AE_NET,EMBEDDING_SIZE,SEED)
 dkmeans = DeepKMeans(ae,K,seed=SEED)
 kmeans = KMeans(n_clusters=K, init="k-means++",random_state=SEED)
 
-logdir = "logs/mnist"
+logdir = "logs/usps"
 file_writer = tf.summary.create_file_writer(logdir,flush_millis=10000)
 file_writer.set_as_default()
 

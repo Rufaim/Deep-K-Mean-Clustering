@@ -87,7 +87,7 @@ class DeepKMeans(tf.keras.Model):
 
             if epoch % update_epoch == 0:
                 rep = self.autoencoder.encode(X, False)
-                _, qs = self._closeness(rep, self.alpha)
+                _, qs = self._closeness(rep, self.alpha * 1000)
                 targets = qs**2 / tf.reduce_sum(qs,axis=0,keepdims=True)
                 targets /= tf.reduce_sum(targets, axis=1, keepdims=True)
 
@@ -98,7 +98,7 @@ class DeepKMeans(tf.keras.Model):
 
                 with tf.GradientTape() as g:
                     rep = self.autoencoder._encode(batch_x,True)
-                    dists, qs = self._closeness(rep, self.alpha)
+                    dists, qs = self._closeness(rep, self.alpha * 1000)
                     loss_cls = tf.reduce_mean(tf.keras.losses.KLD(batch_targets,qs))
                 vars = self.autoencoder.encoder.trainable_variables + [self._centers]
                 grad = g.gradient(loss_cls, vars)
