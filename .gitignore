@@ -1,2 +1,11 @@
+# python files
 *.pyc
+
+# tensorflow logs
 *.out.tfevents.*
+
+# dataset cache files
+*.pkl
+*.gz
+*.pkz
+*.pkl
