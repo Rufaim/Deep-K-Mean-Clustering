@@ -14,7 +14,7 @@ class DeepKMeans(tf.keras.Model):
         self.dist = self._euclid_distance
 
     def build(self, input_shape):
-        init = tf.random_uniform_initializer(minval=-1, maxval=1, seed=self.seed)
+        init = tf.keras.initializers.random_uniform(minval=-1, maxval=1, seed=self.seed)
         self._centers = self.add_weight("centers",
                                         shape=[self.k, int(self.autoencoder.embedding_size)],
                                         initializer=init,
@@ -42,8 +42,8 @@ class DeepKMeans(tf.keras.Model):
         dists,qs= self._closeness(rep,self.alpha)
         return tf.argmax(qs,axis=-1), dists
 
-    def fit(self,X,batch_size,pretrain_epochs=300,finetune_epoch=100,update_epoch=10,pretrain_learning_rate=1e-3,learning_rate=1e-3,seed=None,verbose=False):
-        seed_gen = np.random.RandomState(seed)
+    def fit(self,X,batch_size,pretrain_epochs=300,finetune_epoch=100,update_epoch=10,pretrain_learning_rate=1e-3,learning_rate=1e-3,verbose=False):
+        seed_gen = np.random.RandomState(self.seed)
         self.optimizer = tf.keras.optimizers.Adam(learning_rate=pretrain_learning_rate)
         data = tf.data.Dataset.range(X.shape[0])
 
