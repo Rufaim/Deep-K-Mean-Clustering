@@ -1,10 +1,8 @@
 import tensorflow as tf
-import numpy as np
 from sklearn.cluster import KMeans
-from sklearn.metrics import normalized_mutual_info_score
 from sklearn.datasets import fetch_20newsgroups
 from sklearn.feature_extraction.text import TfidfVectorizer
-from utils import cluster_acc
+from utils import print_results, test_averaged_run
 from autoencoder import AutoEncoder
 from deep_k_means import DeepKMeans
 
@@ -16,10 +14,10 @@ BATCH_SIZE = 256
 PRETRAIN_EPOCHS = 500
 FINETUNE_EPOCH = 250
 UPDATE_EPOCH = 1
+TEST_RUNS = 10
 SEED = 42
 
 gpus = tf.config.list_physical_devices('GPU')
-# Out of jokes it is highly recommended to run the following experiment on gpu
 for gpu in gpus:
     tf.config.set_logical_device_configuration(gpu,
     [tf.config.LogicalDeviceConfiguration(memory_limit=2*1024)])
@@ -32,25 +30,22 @@ X_train = vectorizer.fit_transform(_20news.data)
 X_train = X_train.toarray()
 
 
+def dkmeans_builder(seed):
+    ae = AutoEncoder(AE_NET,EMBEDDING_SIZE,seed)
+    return DeepKMeans(ae,K,seed=seed)
+
+kmeans_builder = lambda seed: KMeans(n_clusters=K, init="k-means++",random_state=seed)
 
 
-ae = AutoEncoder(AE_NET,EMBEDDING_SIZE,SEED)
-dkmeans = DeepKMeans(ae,K,seed=SEED)
-kmeans = KMeans(n_clusters=K, init="k-means++",random_state=SEED)
+def dkmeans_fit(alg, data):
+    alg.fit(data, BATCH_SIZE, PRETRAIN_EPOCHS, FINETUNE_EPOCH, UPDATE_EPOCH, LEARNING_RATE, LEARNING_RATE, verbose=True)
+    cls_dkm, _ = alg(data)
+    return cls_dkm.numpy()
 
-logdir = "logs/20news"
-file_writer = tf.summary.create_file_writer(logdir,flush_millis=10000)
-file_writer.set_as_default()
+def kmeans_fit(alg, data):
+    alg.fit(X_train)
+    return alg.predict(data)
 
-dkmeans.fit(X_train,BATCH_SIZE,PRETRAIN_EPOCHS,FINETUNE_EPOCH,UPDATE_EPOCH,LEARNING_RATE,LEARNING_RATE,seed=SEED,verbose=True)
-kmeans.fit(X_train)
 
-cls_dkm,_ = dkmeans(X_train)
-cls_km = kmeans.predict(X_train)
-
-print("K-means")
-print("   ACC: ", cluster_acc(y_train,cls_km))
-print("   NMI: ", normalized_mutual_info_score(y_train,cls_km))
-print("Deep K-means")
-print("   ACC: ", cluster_acc(y_train,cls_dkm.numpy()))
-print("   NMI: ", normalized_mutual_info_score(y_train,cls_dkm.numpy()))
+result_dict = test_averaged_run(dkmeans_builder, kmeans_builder, dkmeans_fit, kmeans_fit, X_train, y_train, TEST_RUNS, SEED)
+print_results(result_dict)

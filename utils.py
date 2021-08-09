@@ -72,8 +72,8 @@ def test_averaged_run(dkmeans_builder, kmeans_builder,
 
 def print_results(result_dict):
     print("K-means")
-    print("\tACC: {:.2f}\u00B1{:.2f}".format(result_dict["kmeans"]["acc"]["mean"],result_dict["kmeans"]["acc"]["var"]))
-    print("\tNMI: {:.2f}\u00B1{:.2f}".format(result_dict["kmeans"]["nmi"]["mean"], result_dict["kmeans"]["nmi"]["var"]))
+    print("\tACC: {:.2f}\u00B1{:.2f}".format(result_dict["kmeans"]["acc"]["mean"]*100,result_dict["kmeans"]["acc"]["var"]*100))
+    print("\tNMI: {:.2f}\u00B1{:.2f}".format(result_dict["kmeans"]["nmi"]["mean"]*100, result_dict["kmeans"]["nmi"]["var"]*100))
     print("Deep K-means")
-    print("\tACC: {:.2f}\u00B1{:.2f}".format(result_dict["dkmeans"]["acc"]["mean"], result_dict["dkmeans"]["acc"]["var"]))
-    print("\tNMI: {:.2f}\u00B1{:.2f}".format(result_dict["dkmeans"]["nmi"]["mean"], result_dict["dkmeans"]["nmi"]["var"]))
+    print("\tACC: {:.2f}\u00B1{:.2f}".format(result_dict["dkmeans"]["acc"]["mean"]*100, result_dict["dkmeans"]["acc"]["var"]*100))
+    print("\tNMI: {:.2f}\u00B1{:.2f}".format(result_dict["dkmeans"]["nmi"]["mean"]*100, result_dict["dkmeans"]["nmi"]["var"]*100))

@@ -1,7 +1,8 @@
 import tensorflow as tf
 import numpy as np
-from autoencoder import AutoEncoder
 from sklearn.cluster import KMeans
+
+
 
 class DeepKMeans(tf.keras.Model):
     def __init__(self,autoencoder,k,alpha=1.0,seed=None):
@@ -76,7 +77,7 @@ class DeepKMeans(tf.keras.Model):
 
         init_repr = self.autoencoder.encode(X, False)
         init_repr = init_repr.numpy()
-        kmean = KMeans(self.k)
+        kmean = KMeans(self.k, random_state=self.seed)
         kmean.fit(init_repr)
         self._centers.assign(kmean.cluster_centers_)
 
