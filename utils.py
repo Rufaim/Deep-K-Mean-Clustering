@@ -42,7 +42,7 @@ def test_averaged_run(dkmeans_builder, kmeans_builder,
         cls_km = kmeans_fit(kmeans, data)
 
         dkmeans_acc.append(cluster_acc(labels, cls_dkm))
-        dkmeans_nmi.append(normalized_mutual_info_score(labels,cls_km))
+        dkmeans_nmi.append(normalized_mutual_info_score(labels, cls_dkm))
 
         kmeans_acc.append(cluster_acc(labels, cls_km))
         kmeans_nmi.append(normalized_mutual_info_score(labels, cls_km))
@@ -72,7 +72,7 @@ def test_averaged_run(dkmeans_builder, kmeans_builder,
 
 def print_results(result_dict):
     print("K-means")
-    print("\tACC: {:.2f}\u00B1{:.2f}".format(result_dict["kmeans"]["acc"]["mean"]*100,result_dict["kmeans"]["acc"]["var"]*100))
+    print("\tACC: {:.2f}\u00B1{:.2f}".format(result_dict["kmeans"]["acc"]["mean"]*100, result_dict["kmeans"]["acc"]["var"]*100))
     print("\tNMI: {:.2f}\u00B1{:.2f}".format(result_dict["kmeans"]["nmi"]["mean"]*100, result_dict["kmeans"]["nmi"]["var"]*100))
     print("Deep K-means")
     print("\tACC: {:.2f}\u00B1{:.2f}".format(result_dict["dkmeans"]["acc"]["mean"]*100, result_dict["dkmeans"]["acc"]["var"]*100))
